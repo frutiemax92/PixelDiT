@@ -13,6 +13,7 @@
 # limitations under the License.
 #
 # SPDX-License-Identifier: Apache-2.0
+# Modified from https://github.com/NVlabs/Sana
 
 import datetime
 import gc
@@ -36,7 +37,6 @@ from accelerate import Accelerator, InitProcessGroupKwargs, skip_first_batches, 
 from PIL import Image
 from termcolor import colored
 
-# Ensure project root is importable (for pixdit_core, tools, etc.)
 _PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))

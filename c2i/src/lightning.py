@@ -1,3 +1,5 @@
+# Modified from https://github.com/MCG-NJU/PixNerd
+
 from typing import Callable, Iterable, Any, Optional, Union, Sequence, Mapping, Dict
 import os.path
 import copy

@@ -1,3 +1,5 @@
+# Modified from https://github.com/MCG-NJU/PixNerd
+
 import json
 import logging
 import os

@@ -4,6 +4,8 @@
 #
 # flake8: noqa
 
+# Modified from https://github.com/NVlabs/Sana
+
 from .wids import (
     ChunkedSampler,
     DistributedChunkedSampler,

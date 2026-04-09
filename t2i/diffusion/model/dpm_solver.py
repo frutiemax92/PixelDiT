@@ -15,6 +15,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # This file is modified from https://github.com/PixArt-alpha/PixArt-sigma
+# Modified from https://github.com/NVlabs/Sana
+
 import os
 
 import torch

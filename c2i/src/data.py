@@ -1,3 +1,5 @@
+# Modified from https://github.com/MCG-NJU/PixNerd and https://github.com/End2End-Diffusion/REPA-E/
+
 import copy
 import io
 import json

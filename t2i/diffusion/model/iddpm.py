@@ -1,3 +1,5 @@
+# Modified from https://github.com/NVlabs/Sana
+
 from diffusion.model import gaussian_diffusion as gd
 from diffusion.model.respace import SpacedDiffusion, space_timesteps
 

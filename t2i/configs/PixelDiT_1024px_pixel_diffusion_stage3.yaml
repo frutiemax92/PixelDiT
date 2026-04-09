@@ -1,4 +1,4 @@
-# Stage 3: Resume from Stage 2; Multiscale & Around 1024px; No REPA loss; No TextAtlas (low resolution data)
+# Stage 3: Resume from Stage 2; Multiscale & Around 1024px; No REPA loss
 data:
   data_dir: [data/data_public/dir1]
   image_size: 1024

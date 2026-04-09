@@ -15,6 +15,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # This file is modified from https://github.com/PixArt-alpha/PixArt-sigma
+# And modified from https://github.com/NVlabs/Sana
+
 ASPECT_RATIO_1024 = {
     "0.5625": [752.0, 1344.0],
     "0.66": [896.0, 1344.0],

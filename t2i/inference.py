@@ -350,7 +350,7 @@ if __name__ == "__main__":
         save_root += f"_imgnums{args.sample_nums}" + args.add_label
         return save_root
 
-    dataset = "MJHQ-30K" if args.json_file and "MJHQ-30K" in args.json_file else args.dataset
+    dataset = args.dataset
     if args.ablation_selections and args.ablation_key:
         for ablation_factor in args.ablation_selections:
             setattr(args, args.ablation_key, eval(ablation_factor))
