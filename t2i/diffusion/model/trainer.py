@@ -64,6 +64,7 @@ class PixDiTTrainer(nn.Module):
         text_rope_theta = float(extra.get("text_rope_theta", 10000.0))
         repa_encoder_index = int(extra.get("repa_encoder_index", -1))
         use_pixel_abs_pos = bool(extra.get("use_pixel_abs_pos", True))
+        pit_adaln_post_modulation = bool(extra.get("pit_adaln_post_modulation", False))
 
         if PixDiT_T2I is None:
             raise ImportError("Failed to import PixDiT_T2I from pixdit_core.pixeldit_t2i. Check repo layout and PYTHONPATH.")
@@ -84,6 +85,7 @@ class PixDiTTrainer(nn.Module):
             text_rope_theta=text_rope_theta,
             repa_encoder_index=repa_encoder_index,
             use_pixel_abs_pos=use_pixel_abs_pos,
+            pit_adaln_post_modulation=pit_adaln_post_modulation,
         )
 
         self.image_size = int(image_size)
