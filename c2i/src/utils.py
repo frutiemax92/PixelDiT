@@ -104,10 +104,11 @@ class CheckpointHook(ModelCheckpoint):
 
 
 class SaveImagesHook(Callback):
-    def __init__(self, save_dir: str = "val", save_compressed: bool = False):
+    def __init__(self, save_dir: str = "val", save_compressed: bool = False, predict_tag: str = "predict"):
         super().__init__()
         self.save_dir = save_dir
         self.save_compressed = save_compressed
+        self.predict_tag = predict_tag
         self.samples = []
         self.target_dir = None
         self.executor_pool = None
@@ -185,7 +186,7 @@ class SaveImagesHook(Callback):
         self.save_end()
 
     def on_predict_epoch_start(self, trainer: Trainer, pl_module: LightningModule) -> None:
-        target_dir = os.path.join(trainer.default_root_dir, self.save_dir, "predict")
+        target_dir = os.path.join(trainer.default_root_dir, self.save_dir, self.predict_tag)
         self.save_start(target_dir)
 
     def on_predict_batch_end(

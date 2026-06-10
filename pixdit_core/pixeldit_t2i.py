@@ -151,6 +151,7 @@ class PixDiT_T2I(nn.Module):
         text_rope_theta: float = 10000.0,
         repa_encoder_index: int = -1,
         use_pixel_abs_pos: bool = True,
+        pit_adaln_post_modulation: bool = False,
     ):
         super().__init__()
         self.in_channels = int(in_channels)
@@ -168,6 +169,7 @@ class PixDiT_T2I(nn.Module):
         self.text_rope_theta = float(text_rope_theta)
         self.repa_encoder_index = int(repa_encoder_index)
         self.use_pixel_abs_pos = bool(use_pixel_abs_pos)
+        self.pit_adaln_post_modulation = bool(pit_adaln_post_modulation)
         if self.pixel_depth <= 0:
             raise ValueError("PixDiT_T2I expects pixel_depth > 0 to retain the pixel pathway")
 
@@ -205,6 +207,7 @@ class PixDiT_T2I(nn.Module):
                     attn_hidden_size=self.pixel_attn_hidden_size,
                     attn_num_heads=self.pixel_num_groups,
                     rope_fn=precompute_freqs_cis_2d,
+                    adaln_post_modulation=self.pit_adaln_post_modulation,
                 )
                 for _ in range(self.pixel_depth)
             ]

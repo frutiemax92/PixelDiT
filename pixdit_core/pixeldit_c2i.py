@@ -122,6 +122,7 @@ class PiTBlock(nn.Module):
         attn_hidden_size: Optional[int] = None,
         attn_num_heads: Optional[int] = None,
         rope_fn=None,
+        adaln_post_modulation: bool = False,
     ):
         super().__init__()
         self.pixel_dim = int(pixel_hidden_size)
@@ -139,7 +140,9 @@ class PiTBlock(nn.Module):
         self.attn = RotaryAttention(self.attn_dim, num_heads=self.num_heads, qkv_bias=False)
         self.norm2 = RMSNorm(self.pixel_dim, eps=1e-6)
         self.mlp = MLP(self.pixel_dim, mlp_ratio=mlp_ratio, drop=0.0)
-        self.adaLN_modulation = nn.Sequential(nn.Linear(self.context_dim, 6 * self.pixel_dim * p2, bias=True))
+        self.adaln_post_modulation = bool(adaln_post_modulation)
+        n_mod = 4 if self.adaln_post_modulation else 6
+        self.adaLN_modulation = nn.Sequential(nn.Linear(self.context_dim, n_mod * self.pixel_dim * p2, bias=True))
         self._pos_cache = dict()
         self._rope_fn = rope_fn if rope_fn is not None else precompute_freqs_cis_2d
 
@@ -159,19 +162,28 @@ class PiTBlock(nn.Module):
         Hs, Ws = image_height // patch_size, image_width // patch_size
         L = Hs * Ws
         B = BL // L
-        cond_params = self.adaLN_modulation(s_cond)
-        cond_params = cond_params.view(BL, P2, 6 * self.pixel_dim)
-        shift_msa, scale_msa, gate_msa, shift_mlp, scale_mlp, gate_mlp = torch.chunk(cond_params, 6, dim=-1)
-        x_norm = apply_adaln(self.norm1(x), shift_msa, scale_msa)
+        n_mod = 4 if self.adaln_post_modulation else 6
+        cond_params = self.adaLN_modulation(s_cond).view(BL, P2, n_mod * self.pixel_dim)
+        if self.adaln_post_modulation:
+            scale1, shift1, scale2, shift2 = torch.chunk(cond_params, 4, dim=-1)
+            x_norm = self.norm1(x)
+        else:
+            shift_msa, scale_msa, gate_msa, shift_mlp, scale_mlp, gate_mlp = torch.chunk(cond_params, 6, dim=-1)
+            x_norm = apply_adaln(self.norm1(x), shift_msa, scale_msa)
         x_flat = x_norm.view(BL, P2 * self.pixel_dim)
         x_comp = self.compress_to_attn(x_flat).view(B, L, self.attn_dim)
         pos_comp = self._fetch_pos(Hs, Ws, x.device)
         attn_out = self.attn(x_comp, pos_comp, mask)
         attn_flat = self.expand_from_attn(attn_out.view(B * L, self.attn_dim))
         attn_exp = attn_flat.view(BL, P2, self.pixel_dim)
-        x = x + gate_msa * attn_exp
-        mlp_out = self.mlp(apply_adaln(self.norm2(x), shift_mlp, scale_mlp))
-        x = x + gate_mlp * mlp_out
+        if self.adaln_post_modulation:
+            x = x + attn_exp * (1 + scale1) + shift1
+            mlp_out = self.mlp(self.norm2(x))
+            x = x + mlp_out * (1 + scale2) + shift2
+        else:
+            x = x + gate_msa * attn_exp
+            mlp_out = self.mlp(apply_adaln(self.norm2(x), shift_mlp, scale_mlp))
+            x = x + gate_mlp * mlp_out
         return x
 
 
@@ -187,6 +199,7 @@ class PixDiT(nn.Module):
         patch_size=2,
         num_classes=1000,
         use_pixel_abs_pos=True,
+        pit_adaln_post_modulation=False,
     ):
         super().__init__()
         self.in_channels = int(in_channels)
@@ -199,6 +212,7 @@ class PixDiT(nn.Module):
         self.pixel_hidden_size = int(pixel_hidden_size)
         self.num_classes = int(num_classes)
         self.use_pixel_abs_pos = bool(use_pixel_abs_pos)
+        self.pit_adaln_post_modulation = bool(pit_adaln_post_modulation)
         if self.pixel_depth <= 0:
             raise ValueError("PixDiT expects pixel_depth > 0 to preserve the dual-level pipeline")
 
@@ -219,6 +233,7 @@ class PixDiT(nn.Module):
                     patch_size=self.patch_size,
                     num_heads=self.num_groups,
                     mlp_ratio=4.0,
+                    adaln_post_modulation=self.pit_adaln_post_modulation,
                 )
                 for _ in range(self.pixel_depth)
             ]

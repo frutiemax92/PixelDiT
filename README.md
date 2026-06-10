@@ -40,7 +40,11 @@ PixelDiT is a single-stage, end-to-end pixel-space diffusion transformer that el
 
 ## 🔥 News 
 
-- **[2025/11]** Paper, training & inference code, and pre-trained models are released.
+- **[2026/06]** Added a **post-modulation** option for the PiT (pixel-level) blocks that mitigates the training loss spikes ([#6](https://github.com/NVlabs/PixelDiT/issues/6)). See [c2i/README.md](c2i/README.md#training-stability-post-modulation-for-pit-blocks).
+- **[2026/06]** PixelDiT is selected as a CVPR 2026 Best Paper Finalist.
+- **[2026/04]** Training & inference code, and pre-trained models are released.
+- **[2026/02]** PixelDiT is accepted to CVPR 2026 Oral. 
+- **[2025/11]** [arxiv](https://arxiv.org/abs/2511.20645) is released.
 
 ## Performance
 

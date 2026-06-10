@@ -55,6 +55,20 @@ Auto-resume is enabled by default in the config (`auto_resume: true`). If a prev
 
 Checkpoints are auto-downloaded from HuggingFace if the file does not exist locally. Just pass the filename to `--ckpt_path`.
 
+### Training Stability: Post-Modulation for PiT Blocks
+
+If you observe sudden loss / gradient-norm spikes during training (see [#6](https://github.com/NVlabs/PixelDiT/issues/6)), enable **post-modulation adaLN** for the pixel-level (PiT) blocks. Instead of the default 6-way pre-modulation (shift/scale/gate applied to the attention & MLP inputs), each PiT block applies a 4-way scale/shift to the attention & MLP **outputs** (no gate), which mitigates the spikes. Only the PiT blocks are affected; the patch-level blocks are unchanged.
+
+This is controlled by `pit_adaln_post_modulation: true` in the denoiser config and is fully backward compatible (default `false`). Ready-to-use configs are provided:
+
+```bash
+cd c2i/
+# ImageNet 256×256
+bash train_c2i.sh --num-gpus 8 --config configs/pix256_xl_pit_post_modulation.yaml
+# ImageNet 512×512
+bash train_c2i.sh --num-gpus 8 --config configs/pix512_xl_pit_post_modulation.yaml
+```
+
 ## Evaluation
 
 Evaluation generates 50K images via `main.py predict`, then computes FID using the [ADM evaluation suite](https://github.com/openai/guided-diffusion/tree/main/evaluations).
