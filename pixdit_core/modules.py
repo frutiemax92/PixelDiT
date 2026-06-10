@@ -147,8 +147,8 @@ def precompute_freqs_cis_2d(dim: int, height: int, width: int, theta: float = 10
 def precompute_freqs_cis_ex2d(dim: int, height: int, width:int, theta: float = 10000.0, scale=1.0):
     if isinstance(scale, float):
         scale = (scale, scale)
-    x_pos = torch.linspace(0, height*scale[0], width)
-    y_pos = torch.linspace(0, width*scale[1], height)
+    x_pos = torch.linspace(0, width*scale[0], width)
+    y_pos = torch.linspace(0, height*scale[1], height)
     y_pos, x_pos = torch.meshgrid(y_pos, x_pos, indexing="ij")
     y_pos = y_pos.reshape(-1)
     x_pos = x_pos.reshape(-1)
