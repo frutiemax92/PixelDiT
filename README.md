@@ -118,12 +118,15 @@ python tools/compute_flops.py --config c2i/configs/pix256_xl.yaml
 python tools/compute_flops.py --config t2i/configs/PixelDiT_1024px_pixel_diffusion_stage3.yaml --height 1024 --width 1024
 ```
 
+## Acknowledgements
+We would like to thank the authors of [PixNerd](https://github.com/MCG-NJU/PixNerd) and [SANA](https://github.com/NVlabs/SANA) for sharing their code. We also thank the [SANA team](https://arxiv.org/pdf/2410.10629) for sharing their text-to-image training data.
+
 ## Citation
 
 If you find this work useful, please cite:
 
 ```bibtex
-@inproceedings{yu2025pixeldit,
+@inproceedings{yu2026pixeldit,
       title={PixelDiT: Pixel Diffusion Transformers for Image Generation},
       author={Yongsheng Yu and Wei Xiong and Weili Nie and Yichen Sheng and Shiqiu Liu and Jiebo Luo},
       booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
