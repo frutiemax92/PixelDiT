@@ -25,7 +25,9 @@
   &nbsp;
   <a href="https://huggingface.co/nvidia/PixelDiT-ImageNet"><img src="https://img.shields.io/badge/%F0%9F%A4%97_Model-ImageNet-yellow" /></a>
   &nbsp;
-  <a href="https://huggingface.co/nvidia/PixelDiT-1300M-1024px"><img src="https://img.shields.io/badge/%F0%9F%A4%97_Model-T2I-yellow" /></a>
+  <a href="https://huggingface.co/nvidia/PixelDiT-1300M-1024px"><img src="https://img.shields.io/badge/%F0%9F%A4%97_Model-T2I-yellow" /></a> &nbsp; 
+  <a href="https://paperswithcode.co/benchmark/imagenet-256x256?task=image-generation&eval=8057"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpaperswithcode.co%2Fapi%2Fv1%2Fevaluations%2F8057&query=%24.best_rank&prefix=Rank%20%23&label=ImageNet%20256%C3%97256%20FID&color=blue" /></a> <br>
+  <a href="https://paperswithcode.co/conferences/cvpr-2026/best-paper-finalists"><img src="https://img.shields.io/badge/%F0%9F%8F%86_CVPR_2026-Best_Paper_Finalist-gold" /></a> &nbsp;
 </p>
 
 <p align="center">
