@@ -145,17 +145,20 @@ class PixDiTTrainer(nn.Module):
                     dino_resized = F.interpolate(dino_2d, size=(h_u, h_u), mode="bilinear", align_corners=False)
                     dino_resized = dino_resized.flatten(2).permute(0, 2, 1)
                     dino_resized = F.normalize(dino_resized, dim=-1)
-                    repa_loss = -((proj_tokens * dino_resized).sum(dim=-1)).mean()
+                    cosine_sim = (proj_tokens * dino_resized).sum(dim=-1)
+                    repa_loss = (1.0 - cosine_sim).mean()
                 elif Td < Tu:
                     usit_2d = proj_tokens.permute(0, 2, 1).reshape(Bu, Cu, h_u, h_u)
                     usit_resized = F.interpolate(usit_2d, size=(h_d, h_d), mode="bilinear", align_corners=False)
                     usit_resized = usit_resized.flatten(2).permute(0, 2, 1)
                     usit_resized = F.normalize(usit_resized, dim=-1)
                     repa_tokens = F.normalize(repa_tokens, dim=-1)
-                    repa_loss = -((usit_resized * repa_tokens).sum(dim=-1)).mean()
+                    cosine_sim = (usit_resized * repa_tokens).sum(dim=-1)
+                    repa_loss = (1.0 - cosine_sim).mean()
                 else:
                     repa_tokens = F.normalize(repa_tokens, dim=-1)
-                    repa_loss = -((proj_tokens * repa_tokens).sum(dim=-1)).mean()
+                    cosine_sim = (proj_tokens * repa_tokens).sum(dim=-1)
+                    repa_loss = (1.0 - cosine_sim).mean()
             else:
                 # Fallback: 1D sequence alignment if shapes don't allow 2D reshaping
                 repa_tokens_norm = F.normalize(repa_tokens, dim=-1)
@@ -165,11 +168,13 @@ class PixDiTTrainer(nn.Module):
                 if Tu >= Td:
                     # Downsample proj_tokens to match repa_tokens length
                     proj_downsampled = F.adaptive_avg_pool1d(proj_tokens_norm.transpose(1, 2), Td).transpose(1, 2)
-                    repa_loss = -((proj_downsampled * repa_tokens_norm).sum(dim=-1)).mean()
+                    cosine_sim = (proj_downsampled * repa_tokens_norm).sum(dim=-1)
+                    repa_loss = (1.0 - cosine_sim).mean()
                 else:
                     # Downsample repa_tokens to match proj_tokens length
                     repa_downsampled = F.adaptive_avg_pool1d(repa_tokens_norm.transpose(1, 2), Tu).transpose(1, 2)
-                    repa_loss = -((proj_tokens_norm * repa_downsampled).sum(dim=-1)).mean()
+                    cosine_sim = (proj_tokens_norm * repa_downsampled).sum(dim=-1)
+                    repa_loss = (1.0 - cosine_sim).mean()
         return {"x": out, "repa_loss": repa_loss}
 
     def forward_with_dpmsolver(self, x, timestep, y, mask=None, **kwargs):
