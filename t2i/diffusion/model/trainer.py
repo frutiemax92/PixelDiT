@@ -137,6 +137,8 @@ class PixDiTTrainer(nn.Module):
             Bu, Tu, Cu = proj_tokens.shape
             h_u = int(Tu ** 0.5)
             h_d = int(Td ** 0.5)
+            
+            # Try 2D spatial alignment if both are perfect squares
             if h_u * h_u == Tu and h_d * h_d == Td:
                 if Td > Tu:
                     dino_2d = repa_tokens.permute(0, 2, 1).reshape(B, C, h_d, h_d)
@@ -154,6 +156,20 @@ class PixDiTTrainer(nn.Module):
                 else:
                     repa_tokens = F.normalize(repa_tokens, dim=-1)
                     repa_loss = -((proj_tokens * repa_tokens).sum(dim=-1)).mean()
+            else:
+                # Fallback: 1D sequence alignment if shapes don't allow 2D reshaping
+                repa_tokens_norm = F.normalize(repa_tokens, dim=-1)
+                proj_tokens_norm = F.normalize(proj_tokens, dim=-1)
+                
+                # Pad/trim to same length or do average cosine similarity
+                if Tu >= Td:
+                    # Downsample proj_tokens to match repa_tokens length
+                    proj_downsampled = F.adaptive_avg_pool1d(proj_tokens_norm.transpose(1, 2), Td).transpose(1, 2)
+                    repa_loss = -((proj_downsampled * repa_tokens_norm).sum(dim=-1)).mean()
+                else:
+                    # Downsample repa_tokens to match proj_tokens length
+                    repa_downsampled = F.adaptive_avg_pool1d(repa_tokens_norm.transpose(1, 2), Tu).transpose(1, 2)
+                    repa_loss = -((proj_tokens_norm * repa_downsampled).sum(dim=-1)).mean()
         return {"x": out, "repa_loss": repa_loss}
 
     def forward_with_dpmsolver(self, x, timestep, y, mask=None, **kwargs):
